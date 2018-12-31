@@ -1,0 +1,3 @@
+[submodule "app/cstrings"]
+	path = app/cstrings
+	url = https://github.com/jameshume/cstrings.git
