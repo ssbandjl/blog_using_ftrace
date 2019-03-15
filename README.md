@@ -45,5 +45,5 @@ Just go to the `app` directory and type either:
 
 ```bash
 make blog_app  # to make a "release" app or 
-blog_app_debug # to generate a debug version.
+make blog_app_debug # to generate a debug version.
 ```

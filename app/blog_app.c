@@ -19,7 +19,7 @@
 /*
  * DESCRIPTION:
  *   This is a dummy application that will exhibit a specific behaviour. The
- *   imagined driver auther has made a small error: When the driver's only
+ *   imagined driver author has made a small error: When the driver's only
  *   binary file is read more than once in succession, after the 1st read,
  *   no data is ever returned. This was not the driver's intent. We are
  *   imagining that the device always has some informaton to give us, so the
