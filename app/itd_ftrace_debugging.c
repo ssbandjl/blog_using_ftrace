@@ -18,7 +18,7 @@
 
 /* TODO: I use strcpy not strncpy, and some other variables - I think they are
    safe in the context in which they are being used but this warrants a
-   check as they are standard stack smask weak points.*/
+   check as they are standard stack smash weak points.*/
 
 #include <stdio.h>
 #include <stdlib.h>
