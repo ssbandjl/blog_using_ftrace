@@ -28,13 +28,13 @@
 /*
  * Forward declarations
  */
-static ssize_t itdev_example_cdev_read_special_data(
-		struct file *file_ptr, struct kobject *kobj,
-		struct bin_attribute *battr, char *data, loff_t offset,
-		size_t size);
-static ssize_t itdev_example_cdev_read(
-		struct file *file, char *buf,
-		size_t length, loff_t *offset);
+static ssize_t itdev_example_cdev_read_special_data(struct file *file_ptr,
+						    struct kobject *kobj,
+						    struct bin_attribute *battr,
+						    char *data, loff_t offset,
+						    size_t size);
+static ssize_t itdev_example_cdev_read(struct file *file, char __user *buf,
+				       size_t length, loff_t *offset);
 static int __init itdev_example_cdev_init(void);
 static void __exit itdev_example_cdev_exit(void);
 
@@ -78,8 +78,8 @@ const struct file_operations fops = {
 };
 
 /*
- * The driver "context". This structure holds data for the device instance(s)
- * in a structure that private to the driver.
+ * The driver "context". This structure holds data for the device instance
+ * in a structure that is private to the driver.
  *
  * devnum   - Device major/minor number.
  * pdev     - Character device.
@@ -105,10 +105,11 @@ struct itdev_example_cdev_ctx {
  * /sys/devices/itdev/special_file. It will return a block of data of a fixed
  * size.
  */
-static ssize_t itdev_example_cdev_read_special_data(
-		struct file *file_ptr, struct kobject *kobj,
-		struct bin_attribute *battr, char *data, loff_t offset,
-		size_t size)
+static ssize_t itdev_example_cdev_read_special_data(struct file *file_ptr,
+						    struct kobject *kobj,
+						    struct bin_attribute *battr,
+						    char *data, loff_t offset,
+						    size_t size)
 {
 #ifdef DEBUG
 	trace_printk(TAG "Reading %zu bytes\n", size);
@@ -125,9 +126,8 @@ static ssize_t itdev_example_cdev_read_special_data(
  * The character device read function. Just returns a dummy string to
  * the user.
  */
-static ssize_t itdev_example_cdev_read(
-		struct file *file, char *buf,
-		size_t length, loff_t *offset)
+static ssize_t itdev_example_cdev_read(struct file *file, char __user *buf,
+				       size_t length, loff_t *offset)
 {
 	ssize_t bytes_read = 0;
 
@@ -143,7 +143,7 @@ static ssize_t itdev_example_cdev_read(
 }
 
 /*
- * Function is called when the module is loaded. it will allocate a major and
+ * Function is called when the module is loaded. It will allocate a major and
  * minor number for a new character device, allocate the device and associate
  * it with its maj/min number. It will also setup the character device's
  * file operations - we only implement read. The device will appear as
@@ -156,18 +156,17 @@ static int __init itdev_example_cdev_init(void)
 {
 	int result;
 
-	printk(TAG "ITDev Ltd. example cdev init\n");
+	pr_info(TAG "ITDev Ltd. example cdev init\n");
 
 	/*
 	 * Allocate a device number to use. The major and minor numbers are
 	 * returned in `devnum`
 	 */
-	result = alloc_chrdev_region(
-		&gbl_ctx.devnum, 0, NUM_MINOR_DEVS,
-		"ITDev Blog Example Driver");
+	result = alloc_chrdev_region(&gbl_ctx.devnum, 0, NUM_MINOR_DEVS,
+				     "ITDev Blog Example Driver");
 	if (result)
 		goto alloc_chrdev_failed;
-	printk(TAG "Device major number: %u\n", MAJOR(gbl_ctx.devnum));
+	pr_info(TAG "Device major number: %u\n", MAJOR(gbl_ctx.devnum));
 
 	/*
 	 * Create a cdev for each device - we only have one in this toy
@@ -207,16 +206,15 @@ static int __init itdev_example_cdev_init(void)
 	 * should never exhaust as we imagine that the device always has
 	 * binary data to return.
 	 */
-	printk(TAG "Creating the sysfs attributes\n");
+	pr_info(TAG "Creating the sysfs attributes\n");
 	sysfs_bin_attr_init(&gbl_ctx.battr);
 	gbl_ctx.battr.attr.name = "special_data";
-	gbl_ctx.battr.attr.mode = S_IRUGO;
+	gbl_ctx.battr.attr.mode = 0644;
 	gbl_ctx.battr.read = itdev_example_cdev_read_special_data;
 	gbl_ctx.battr.write = NULL;
 	gbl_ctx.battr.size = test_data_block_len; /* Hint: Problem here! */
 
-	result = sysfs_create_bin_file(
-		&gbl_ctx.sysfsdev->kobj, &gbl_ctx.battr);
+	result = sysfs_create_bin_file(&gbl_ctx.sysfsdev->kobj, &gbl_ctx.battr);
 	if (result)
 		goto bin_file_failed;
 
@@ -237,7 +235,7 @@ module_init(itdev_example_cdev_init);
  */
 static void __exit itdev_example_cdev_exit(void)
 {
-	printk(TAG "ITDev Ltd. example cdev exit\n");
+	pr_info(TAG "ITDev Ltd. example cdev exit\n");
 	sysfs_remove_bin_file(&gbl_ctx.sysfsdev->kobj, &gbl_ctx.battr);
 	root_device_unregister(gbl_ctx.sysfsdev);
 	cdev_del(gbl_ctx.pdev);
