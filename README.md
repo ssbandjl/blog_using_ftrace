@@ -1,5 +1,3 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/31b39a241f324d53a798ed80016346c6)](https://www.codacy.com/app/jh-itdev/blog_using_ftrace?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jh-itdev/blog_using_ftrace&amp;utm_campaign=Badge_Grade)
-
 # ITDev Blog: Using FTrace Example Source Code
 
 Source code for a blog about using ftrace to debug an imaginary driver bug.
