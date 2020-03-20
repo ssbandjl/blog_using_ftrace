@@ -14,6 +14,10 @@ bug in the driver code. The author intends for the binary file to *always* provi
 as-if it were an infinite file. However, upon reading this file we will find that only one block of data is returned
 and from then on, nothing. See the blog for more information - visit www.itdev.co.uk.
 
+The Linux kernel [scripts/checkpatch.pl](https://github.com/torvalds/linux/tree/master/scripts/checkpatch.pl) script
+has been used to verify that the example code complies with the
+[Linux kernel coding style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html).
+
 ## Setting up the repo
 This repo uses submodules. When you clone it remember to use
 ```bash
