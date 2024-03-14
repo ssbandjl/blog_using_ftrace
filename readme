@@ -1,0 +1,24 @@
+itdev_example_cdev_read_special_data
+
+关于使用 ftrace 调试虚构的驱动程序错误的博客的源代码。 注意：分发此程序的目的是希望它有用，但根据许可证没有任何保证，因此请通读源代码以确保您知道您正在运行什么。 相关博客提供了一个示例，说明如何从驱动程序、命令行和用户空间应用程序使用 ftrace 来调试驱动程序问题。 在此示例中，我们假设 cdev 驱动程序为设备创建一个 sysfs 二进制文件，用于读回一些数据。 例如，也许它是特殊的状态信息。 没关系。 重要的是驱动程序代码中存在错误。 作者希望二进制文件始终向用户提供一些数据。 就好像它是一个无限的文件。 然而，当我们读这个文件时，我们会发现只返回了一块数据，之后就什么也没有了。 请参阅博客了解更多信息 - 访问 www.itdev.co.uk。 Linux kernel scripts/checkpatch.pl 脚本用于验证示例代码是否符合 Linux 内核编码风格。 设置存储库 该存储库使用子模块。 当你克隆它时，记得使用 git submodule init git submodule update 编译驱动程序 驱动程序只是一个基本的字符设备驱动程序。 这意味着，如果您可以使用 sudo 权限访问 Linux 机器，则不需要任何特殊硬件来编译和运行它。 这仅在 Ubuntu 上进行了测试。 在 Ubuntu 发行版上安装内核头文件，输入以下命令。 apt-get install linux-headers-$(uname -r) libelf-dev 您现在可以转到驱动程序目录并输入 make 来构建驱动程序。 该模块应构建为most_basic.ko。 要加载驱动程序，请使用 start.sh 脚本。 这将删除该模块及其 /dev/itdev0 伪文件的所有已加载版本并重新加载/重新创建。 编译应用程序只需转到应用程序目录并输入： make blog_app # 制作“发布”应用程序或 make blog_app_debug # 生成调试版本
+
+
+/sys/devices/itdev
+
+build on running os:
+make -C /lib/modules/`uname -r`/build M=$PWD
+make -C /lib/modules/`uname -r`/build M=$PWD modules_install
+
+
+
+ftrace,
+cd /sys/kernel/debug/tracing
+echo 0 > tracing_on
+echo function_graph > current_tracer
+echo dev_attr_show > set_graph_function
+echo 1 > tracing_on
+sleep 3
+cat trace
+
+watch
+dmesg -w
